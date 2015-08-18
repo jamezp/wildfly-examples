@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ JBoss, Home of Professional Open Source.
+  ~
+  ~ Copyright 2015 Red Hat, Inc., and individual contributors
+  ~ as indicated by the @author tags.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.wildfly.example</groupId>
+    <artifactId>wildfly-extension</artifactId>
+    <version>1.0.0.Final-SNAPSHOT</version>
+
+    <parent>
+        <groupId>org.jboss</groupId>
+        <artifactId>jboss-parent</artifactId>
+        <version>17</version>
+    </parent>
+
+    <licenses>
+        <license>
+            <name>Apache License Version 2.0</name>
+            <url>http://repository.jboss.org/licenses/apache-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <properties>
+        <version.org.jboss.logging>3.3.0.Final</version.org.jboss.logging>
+        <version.org.jboss.logging.jboss-logging-tools>2.0.1.Final</version.org.jboss.logging.jboss-logging-tools>
+        <version.org.wildfly.core>1.0.1.Final</version.org.wildfly.core>
+        <version.org.wildfly.maven-plugin>1.1.0.Alpha3-SNAPSHOT</version.org.wildfly.maven-plugin>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+            <version>${version.org.jboss.logging}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-annotations</artifactId>
+            <version>${version.org.jboss.logging.jboss-logging-tools}</version>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging-processor</artifactId>
+            <version>${version.org.jboss.logging.jboss-logging-tools}</version>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.core</groupId>
+            <artifactId>wildfly-controller</artifactId>
+            <version>${version.org.wildfly.core}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.core</groupId>
+            <artifactId>wildfly-server</artifactId>
+            <version>${version.org.wildfly.core}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <!-- Make sure the a JBOSS_HOME environment variable is set before attempting to execute this profile -->
+            <id>setup</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.wildfly.plugins</groupId>
+                        <artifactId>wildfly-maven-plugin</artifactId>
+                        <version>${version.org.wildfly.maven-plugin}</version>
+                        <executions>
+                            <execution>
+                                <id>setup</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>execute-commands</goal>
+                                </goals>
+                                <configuration>
+                                    <execute-commands>
+                                        <commands>
+                                            <command>module add --name=org.wildfly.example.extension.deployment.module
+                                                --resources=${project.build.directory}${file.separator}${project.build.finalName}.jar
+                                                --dependencies=javax.api,org.jboss.as.controller,org.jboss.as.server,org.jboss.logging,org.jboss.msc,org.jboss.modules,org.jboss.staxmapper
+                                            </command>
+                                            <command>/extension=org.wildfly.example.extension.deployment.module:add
+                                            </command>
+                                            <command>/subsystem=deployment-modules:add</command>
+                                        </commands>
+                                    </execute-commands>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- Make sure the a JBOSS_HOME environment variable is set before attempting to execute this profile -->
+            <id>teardown</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.wildfly.plugins</groupId>
+                        <artifactId>wildfly-maven-plugin</artifactId>
+                        <version>${version.org.wildfly.maven-plugin}</version>
+                        <executions>
+                            <execution>
+                                <id>teardown</id>
+                                <phase>clean</phase>
+                                <goals>
+                                    <goal>execute-commands</goal>
+                                </goals>
+                                <configuration>
+                                    <execute-commands>
+                                        <commands>
+                                            <command>/subsystem=deployment-modules:remove</command>
+                                            <command>:reload</command>
+                                            <command>/extension=org.wildfly.example.extension.deployment.module:remove
+                                            </command>
+                                            <command>module remove
+                                                --name=org.wildfly.example.extension.deployment.module
+                                            </command>
+                                        </commands>
+                                    </execute-commands>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
