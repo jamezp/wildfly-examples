@@ -48,7 +48,7 @@ public class DeploymentModuleProcessor implements DeploymentUnitProcessor {
         for (DeploymentDependency dep : service.getValue()) {
             if (dep.isInclude()) {
                 DeploymentModuleLogger.LOGGER.includingModule(dep.getIdentifier());
-                moduleSpecification.addUserDependency(new ModuleDependency(moduleLoader, dep.getIdentifier(), false, false, false, true));
+                moduleSpecification.addUserDependency(new ModuleDependency(moduleLoader, dep.getIdentifier(), false, false, dep.isImport(), true));
             } else {
                 DeploymentModuleLogger.LOGGER.excludingModule(dep.getIdentifier());
                 moduleSpecification.addExclusion(dep.getIdentifier());
