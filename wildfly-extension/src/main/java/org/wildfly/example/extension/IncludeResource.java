@@ -19,9 +19,10 @@
 
 package org.wildfly.example.extension;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.AttributeDefinition;
@@ -50,12 +51,18 @@ public class IncludeResource extends PersistentResourceDefinition {
             .setRestartAllServices()
             .build();
 
-    private static final Set<AttributeDefinition> ATTRIBUTES = Collections.singleton(IMPORT_SERVICES);
+    private static final AttributeDefinition OPTIONAL = SimpleAttributeDefinitionBuilder.create("optional", ModelType.BOOLEAN, true)
+            .setDefaultValue(new ModelNode(false))
+            .setRestartAllServices()
+            .build();
+
+    private static final List<AttributeDefinition> ATTRIBUTES = Collections.unmodifiableList(Arrays.asList(IMPORT_SERVICES, OPTIONAL));
 
     static final IncludeResource INSTANCE = new IncludeResource();
 
     static final PersistentResourceXMLDescription.PersistentResourceXMLBuilder XML_BUILDER = PersistentResourceXMLDescription.builder(INSTANCE)
-            .addAttribute(IMPORT_SERVICES);
+            .addAttribute(IMPORT_SERVICES)
+            .addAttribute(OPTIONAL);
 
     private IncludeResource() {
         super(
@@ -83,7 +90,8 @@ public class IncludeResource extends PersistentResourceDefinition {
 
             final ModuleIdentifier identifier = ModuleIdentifier.create(context.getCurrentAddressValue());
             final boolean importServices = IMPORT_SERVICES.resolveModelAttribute(context, model).asBoolean();
-            service.addInclude(identifier, importServices);
+            final boolean optional = OPTIONAL.resolveModelAttribute(context, model).asBoolean();
+            service.addInclude(identifier, importServices, optional);
             context.reloadRequired();
         }
 

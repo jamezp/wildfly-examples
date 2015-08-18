@@ -29,11 +29,14 @@ public class DeploymentDependency {
     private final ModuleIdentifier identifier;
     private final boolean include;
     private final boolean importServices;
+    private final boolean optional;
 
-    protected DeploymentDependency(final ModuleIdentifier identifier, final boolean include, final boolean importServices) {
+    protected DeploymentDependency(final ModuleIdentifier identifier, final boolean include,
+                                   final boolean importServices, final boolean optional) {
         this.identifier = identifier;
         this.include = include;
         this.importServices = importServices;
+        this.optional = optional;
     }
 
     public ModuleIdentifier getIdentifier() {
@@ -46,5 +49,9 @@ public class DeploymentDependency {
 
     public boolean isImport() {
         return importServices;
+    }
+
+    public boolean isOptional() {
+        return optional;
     }
 }

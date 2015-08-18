@@ -56,8 +56,8 @@ public class DeploymentModulesService implements Service<Set<DeploymentDependenc
         }
     }
 
-    protected DeploymentDependency addInclude(final ModuleIdentifier moduleIdentifier, final boolean importServices) {
-        return modules.put(moduleIdentifier, new DeploymentDependency(moduleIdentifier, true, importServices));
+    protected DeploymentDependency addInclude(final ModuleIdentifier moduleIdentifier, final boolean importServices, final boolean optional) {
+        return modules.put(moduleIdentifier, new DeploymentDependency(moduleIdentifier, true, importServices, optional));
     }
 
     protected DeploymentDependency removeInclude(final ModuleIdentifier moduleIdentifier) {
@@ -65,7 +65,7 @@ public class DeploymentModulesService implements Service<Set<DeploymentDependenc
     }
 
     protected DeploymentDependency addExclude(final ModuleIdentifier moduleIdentifier) {
-        return modules.put(moduleIdentifier, new DeploymentDependency(moduleIdentifier, false, false));
+        return modules.put(moduleIdentifier, new DeploymentDependency(moduleIdentifier, false, false, false));
     }
 
     protected DeploymentDependency removeExclude(final ModuleIdentifier moduleIdentifier) {
