@@ -1,0 +1,9 @@
+= Custom Filter Example
+
+The custom filter example can be used to filter log messages based on a pattern and the current threads context
+class loader.
+
+== Running the Example
+
+To run the example simply download the source and run `mvn clean wildfly:run`. Once the server is stared and the
+application is deployment navigate to http://localhost:8080/app.
